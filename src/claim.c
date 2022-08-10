@@ -59,8 +59,12 @@ static inline void l8w8jwt_escape_claim_string(struct chillbuff* stringbuilder, 
             case '\\':
                 chillbuff_push_back(stringbuilder, "\\\\", 2);
                 break;
-            case '\"':
-                chillbuff_push_back(stringbuilder, "\\\"", 2);
+            // This does not properly handle escaped quotes of strings used in arrays of strings
+            // case '\"':
+            //     chillbuff_push_back(stringbuilder, "\\\"", 2);
+            //     break;
+            case '\n':
+                chillbuff_push_back(stringbuilder, "\\n", 2);
                 break;
             default:
                 chillbuff_push_back(stringbuilder, &c, 1);

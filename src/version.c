@@ -27,7 +27,7 @@ void l8w8jwt_free(void* mem)
     free(mem);
 }
 
-int l8w8jwt_get_version_number()
+int l8w8jwt_get_version_number(void)
 {
     return (int)L8W8JWT_VERSION;
 }

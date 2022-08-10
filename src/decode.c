@@ -435,9 +435,9 @@ int l8w8jwt_decode(struct l8w8jwt_decoding_params* params, enum l8w8jwt_validati
             pk = crt.pk;
         }
 
-        size_t md_length;
-        mbedtls_md_type_t md_type;
-        mbedtls_md_info_t* md_info;
+        size_t md_length = 0;
+        mbedtls_md_type_t md_type = 0;
+        mbedtls_md_info_t* md_info = 0;
 
         md_info_from_alg(alg, &md_info, &md_type, &md_length);
 
@@ -533,7 +533,7 @@ int l8w8jwt_decode(struct l8w8jwt_decoding_params* params, enum l8w8jwt_validati
                 mbedtls_rsa_context* rsa = mbedtls_pk_rsa(pk);
                 mbedtls_rsa_set_padding(rsa, MBEDTLS_RSA_PKCS_V21, md_type);
 
-                r = mbedtls_rsa_rsassa_pss_verify(rsa, md_type, md_length, hash, signature);
+                r = mbedtls_rsa_rsassa_pss_verify(rsa, NULL, NULL, 0, md_type, md_length, hash, signature);
                 if (r != 0)
                 {
                     validation_res |= (unsigned)L8W8JWT_SIGNATURE_VERIFICATION_FAILURE;
@@ -580,7 +580,7 @@ int l8w8jwt_decode(struct l8w8jwt_decoding_params* params, enum l8w8jwt_validati
                 mbedtls_mpi_read_binary(&sig_r, signature, half_signature_length);
                 mbedtls_mpi_read_binary(&sig_s, signature + half_signature_length, half_signature_length);
 
-                r = mbedtls_ecdsa_verify(&ecdsa.MBEDTLS_PRIVATE(grp), hash, md_length, &ecdsa.MBEDTLS_PRIVATE(Q), &sig_r, &sig_s);
+                r = mbedtls_ecdsa_verify(&ecdsa.grp, hash, md_length, &ecdsa.Q, &sig_r, &sig_s);
                 if (r != 0)
                 {
                     validation_res |= (unsigned)L8W8JWT_SIGNATURE_VERIFICATION_FAILURE;

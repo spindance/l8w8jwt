@@ -263,9 +263,9 @@ static int write_signature(chillbuff* stringbuilder, struct l8w8jwt_encoding_par
         goto exit;
     }
 
-    size_t md_length;
-    mbedtls_md_type_t md_type;
-    mbedtls_md_info_t* md_info;
+    size_t md_length = 0;
+    mbedtls_md_type_t md_type = 0;
+    mbedtls_md_info_t* md_info = 0;
 
     md_info_from_alg(alg, &md_info, &md_type, &md_length);
 
@@ -299,7 +299,7 @@ static int write_signature(chillbuff* stringbuilder, struct l8w8jwt_encoding_par
 
             /* Parse & load the key string into the mbedtls pk instance. */
 
-            r = mbedtls_pk_parse_key(&pk, key, key_length, params->secret_key_pw, params->secret_key_pw_length, mbedtls_ctr_drbg_random, &ctr_drbg);
+            r = mbedtls_pk_parse_key(&pk, key, key_length, params->secret_key_pw, params->secret_key_pw_length);
             if (r != 0)
             {
                 r = L8W8JWT_KEY_PARSE_FAILURE;
@@ -329,7 +329,7 @@ static int write_signature(chillbuff* stringbuilder, struct l8w8jwt_encoding_par
             }
 
             /* Sign the hash using the provided private key. */
-            r = mbedtls_pk_sign(&pk, md_type, hash, md_length, signature_bytes, 4096, &signature_bytes_length, mbedtls_ctr_drbg_random, &ctr_drbg);
+            r = mbedtls_pk_sign(&pk, md_type, hash, md_length, signature_bytes, &signature_bytes_length, mbedtls_ctr_drbg_random, &ctr_drbg);
             if (r != L8W8JWT_SUCCESS)
             {
                 r = L8W8JWT_SIGNATURE_CREATION_FAILURE;
@@ -342,7 +342,7 @@ static int write_signature(chillbuff* stringbuilder, struct l8w8jwt_encoding_par
         case L8W8JWT_ALG_PS384:
         case L8W8JWT_ALG_PS512: {
 
-            r = mbedtls_pk_parse_key(&pk, key, key_length, params->secret_key_pw, params->secret_key_pw_length, mbedtls_ctr_drbg_random, &ctr_drbg);
+            r = mbedtls_pk_parse_key(&pk, key, key_length, params->secret_key_pw, params->secret_key_pw_length);
             if (r != 0)
             {
                 r = L8W8JWT_KEY_PARSE_FAILURE;
@@ -371,7 +371,7 @@ static int write_signature(chillbuff* stringbuilder, struct l8w8jwt_encoding_par
             mbedtls_rsa_context* rsa = mbedtls_pk_rsa(pk);
             mbedtls_rsa_set_padding(rsa, MBEDTLS_RSA_PKCS_V21, md_type);
 
-            r = mbedtls_rsa_rsassa_pss_sign(rsa, mbedtls_ctr_drbg_random, &ctr_drbg, md_type, (unsigned int)md_length, hash, signature_bytes);
+            r = mbedtls_rsa_rsassa_pss_sign(rsa, mbedtls_ctr_drbg_random, &ctr_drbg, 0, md_type, (unsigned int)md_length, hash, signature_bytes);
             if (r != 0)
             {
                 r = L8W8JWT_SIGNATURE_CREATION_FAILURE;
@@ -393,7 +393,7 @@ static int write_signature(chillbuff* stringbuilder, struct l8w8jwt_encoding_par
             mbedtls_mpi_init(&sig_r);
             mbedtls_mpi_init(&sig_s);
 
-            r = mbedtls_pk_parse_key(&pk, key, key_length, params->secret_key_pw, params->secret_key_pw_length, mbedtls_ctr_drbg_random, &ctr_drbg);
+            r = mbedtls_pk_parse_key(&pk, key, key_length, params->secret_key_pw, params->secret_key_pw_length);
             if (r != 0)
             {
                 r = L8W8JWT_KEY_PARSE_FAILURE;
@@ -425,7 +425,7 @@ static int write_signature(chillbuff* stringbuilder, struct l8w8jwt_encoding_par
             {
                 case L8W8JWT_ALG_ES256: {
 
-                    if (ecdsa.MBEDTLS_PRIVATE(grp).id != MBEDTLS_ECP_DP_SECP256R1)
+                    if (ecdsa.grp.id != MBEDTLS_ECP_DP_SECP256R1)
                     {
                         r = L8W8JWT_WRONG_KEY_TYPE;
                         goto ecdsa_exit;
@@ -437,7 +437,7 @@ static int write_signature(chillbuff* stringbuilder, struct l8w8jwt_encoding_par
                 }
                 case L8W8JWT_ALG_ES256K: {
 
-                    if (ecdsa.MBEDTLS_PRIVATE(grp).id != MBEDTLS_ECP_DP_SECP256K1)
+                    if (ecdsa.grp.id != MBEDTLS_ECP_DP_SECP256K1)
                     {
                         r = L8W8JWT_WRONG_KEY_TYPE;
                         goto ecdsa_exit;
@@ -449,7 +449,7 @@ static int write_signature(chillbuff* stringbuilder, struct l8w8jwt_encoding_par
                 }
                 case L8W8JWT_ALG_ES384: {
 
-                    if (ecdsa.MBEDTLS_PRIVATE(grp).id != MBEDTLS_ECP_DP_SECP384R1)
+                    if (ecdsa.grp.id != MBEDTLS_ECP_DP_SECP384R1)
                     {
                         r = L8W8JWT_WRONG_KEY_TYPE;
                         goto ecdsa_exit;
@@ -461,7 +461,7 @@ static int write_signature(chillbuff* stringbuilder, struct l8w8jwt_encoding_par
                 }
                 case L8W8JWT_ALG_ES512: {
 
-                    if (ecdsa.MBEDTLS_PRIVATE(grp).id != MBEDTLS_ECP_DP_SECP521R1)
+                    if (ecdsa.grp.id != MBEDTLS_ECP_DP_SECP521R1)
                     {
                         r = L8W8JWT_WRONG_KEY_TYPE;
                         goto ecdsa_exit;
@@ -485,7 +485,7 @@ static int write_signature(chillbuff* stringbuilder, struct l8w8jwt_encoding_par
                 goto ecdsa_exit;
             }
 
-            r = mbedtls_ecdsa_sign(&ecdsa.MBEDTLS_PRIVATE(grp), &sig_r, &sig_s, &ecdsa.MBEDTLS_PRIVATE(d), hash, md_length, mbedtls_ctr_drbg_random, &ctr_drbg);
+            r = mbedtls_ecdsa_sign(&ecdsa.grp, &sig_r, &sig_s, &ecdsa.d, hash, md_length, mbedtls_ctr_drbg_random, &ctr_drbg);
             if (r != 0)
             {
                 r = L8W8JWT_SIGNATURE_CREATION_FAILURE;
