@@ -174,7 +174,7 @@ L8W8JWT_API struct l8w8jwt_encoding_params
     /**
      * Where the output token string length should be written into.
      */
-    size_t* out_length;
+    uint16_t* out_length;
 };
 
 /**
