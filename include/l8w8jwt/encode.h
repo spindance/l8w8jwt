@@ -53,7 +53,7 @@ L8W8JWT_API struct l8w8jwt_encoding_params
      * [OPTIONAL] The issuer claim (who issued the JWT?). Can be omitted by setting this to <code>NULL</code>.
      * @see https://tools.ietf.org/html/rfc7519#section-4.1.1
      */
-    const char* iss;
+    char* iss;
 
     /**
      * iss claim string length.
@@ -64,7 +64,7 @@ L8W8JWT_API struct l8w8jwt_encoding_params
      * [OPTIONAL] The subject claim (who is the JWT about?). Set to <code>NULL</code> if you don't want it in your token.
      * @see https://tools.ietf.org/html/rfc7519#section-4.1.2
      */
-    const char* sub;
+    char* sub;
 
     /**
      * sub claim string length.
@@ -76,7 +76,7 @@ L8W8JWT_API struct l8w8jwt_encoding_params
      * Set this to <code>NULL</code> if you don't wish to add this claim to the token.
      * @see https://tools.ietf.org/html/rfc7519#section-4.1.3
      */
-    const char* aud;
+    char* aud;
 
     /**
      * aud claim string length.
@@ -87,7 +87,7 @@ L8W8JWT_API struct l8w8jwt_encoding_params
      * [OPTIONAL] The JWT ID. Provides a unique identifier for the token. Can be omitted by setting this to <code>NULL</code>.
      * @see https://tools.ietf.org/html/rfc7519#section-4.1.7
      */
-    const char* jti;
+    char* jti;
 
     /**
      * jti claim string length.
