@@ -64,7 +64,7 @@ static inline void l8w8jwt_escape_claim_string(struct chillbuff* stringbuilder, 
             //     chillbuff_push_back(stringbuilder, "\\\"", 2);
             //     break;
             case '\n':
-                chillbuff_push_back(stringbuilder, "\\n", 2);
+                // For our use case, skip over newlines in strings.
                 break;
             default:
                 chillbuff_push_back(stringbuilder, &c, 1);
